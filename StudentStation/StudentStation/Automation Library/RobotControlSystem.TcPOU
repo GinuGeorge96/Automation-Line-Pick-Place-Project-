@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="RobotControlSystem" Id="{f6e2fbe6-3561-4b9f-9545-d178090ca923}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK RobotControlSystem
+VAR_INPUT
+	Enable: BOOL;
+	mxABBMoveStart: BOOL;
+	mwTargetX: INT;
+	mwTargetY: INT;
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	ABBMove: INT;
+	RSpeed:INT:=1;
+END_VAR
+
+VAR_IN_OUT
+	mwRobotXaxis: INT;
+	mwRobotYaxis: INT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF Enable THEN
+	CASE ABBMove OF
+		0:
+			IF mxABBMoveStart THEN
+				ABBMove:=10;
+			END_IF
+		10:
+			IF NOT CommData.mxABBExecuting THEN
+				CommData.mxABBExecuting:=TRUE;
+				ABBMove:=20;
+			END_IF
+		20:
+			IF mwRobotXaxis < mwTargetX THEN
+				mwRobotXaxis :=mwRobotXaxis+RSpeed;
+				ABBMove:=30;
+			ELSIF mwRobotXaxis > mwTargetX THEN
+				mwRobotXaxis :=mwRobotXaxis-RSpeed;
+				ABBMove:=30;
+			ELSIF mwRobotXaxis = mwTargetX THEN
+				ABBMove:=30;
+			END_IF
+		30:
+			IF mwRobotYaxis < mwTargetY THEN
+				mwRobotYaxis :=mwRobotYaxis+RSpeed;
+				ABBMove:=40;
+			ELSIF mwRobotYaxis > mwTargetY THEN
+				mwRobotYaxis :=mwRobotYaxis-RSpeed;
+				ABBMove:=40;
+			ELSIF mwRobotYaxis = mwTargetY THEN
+				ABBMove:=40;
+			END_IF
+		40:
+			IF mwRobotXaxis = mwTargetX AND mwRobotYaxis = mwTargetY THEN
+				ABBMove:=50;
+			ELSIF gvl.ixEmergencyStop THEN
+				ABBMove:=50;
+			ELSE
+				ABBMOve:=20;
+			END_IF
+		50:
+			CommData.mxABBExecuting:=FALSE;
+			IF NOT mxABBMoveStart THEN
+				ABBMove:=0;
+			END_IF
+	END_CASE
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="RobotControlSystem">
+      <LineId Id="9" Count="1" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="16" Count="2" />
+      <LineId Id="20" Count="2" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="35" Count="1" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="42" Count="5" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="94" Count="1" />
+      <LineId Id="59" Count="1" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="61" Count="1" />
+      <LineId Id="64" Count="1" />
+      <LineId Id="63" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="90" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

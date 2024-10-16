@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <POU Name="ABBGotoHome" Id="{eeb3ef0d-7ac6-42c7-b6b3-6594621c50cd}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK ABBGotoHome
+VAR_INPUT
+	mxEnable: BOOL;
+END_VAR
+VAR_OUTPUT
+	mxDone:BOOL;
+	mxExecuting: BOOL;
+	mxError: BOOL;
+END_VAR
+VAR
+	ABB: INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE ABB OF
+	0:
+		IF mxEnable AND NOT CommData.mxABBExecuting THEN
+			ABB:=10;
+		END_IF
+	10:
+		IF CommData.mxRobotOnline THEN
+			ABB:=100;
+			ELSE
+			ABB:=200;
+		END_IF
+	100:
+		mxExecuting:=TRUE;
+		CommData.maOrderMaker[1] := 1;
+		CommData.maOrderMaker[2] := 0;
+		CommData.maOrderMaker[3] := 0;
+		CommData.maOrderMaker[4] := 0;
+		CommData.maOrderMaker[5] := 0;
+		CommData.maOrderMaker[6] := 0;
+		CommData.qwOrderRobot:=100000;
+		ABB:=101;
+	101:
+		IF CommData.qwOrderRobot > 0 THEN
+			CommData.qxPLCStrobe:=TRUE;
+			ABB:=102;
+		END_IF
+	102:
+		IF CommData.ixRobotStrobe THEN
+			IF CommData.iwReplyRobot = CommData.qwOrderRobot+1 THEN
+				CommData.qwOrderRobot:=0;
+				CommData.maOrderMaker[1] := 0;
+				CommData.maOrderMaker[2] := 0;
+				CommData.maOrderMaker[3] := 0;
+				CommData.maOrderMaker[4] := 0;
+				CommData.maOrderMaker[5] := 0;
+				CommData.maOrderMaker[6] := 0;
+				CommData.qxPLCStrobe:=FALSE;
+				ABB:=103;
+			ELSE
+				ABB:=1000;
+			END_IF
+		END_IF
+	103:
+		IF NOT CommData.ixRobotStrobe THEN
+			IF CommData.iwReplyRobot = 0 THEN
+				ABB:=104;
+			ELSE
+				ABB:=1000;
+			END_IF
+		END_IF
+	104:
+		IF CommData.ixRobotStrobe THEN
+			IF CommData.iwProgressRobot = 90 THEN
+				CommData.qxPLCStrobe:=TRUE;
+				ABB:=105;
+			END_IF
+			IF CommData.iwProgressRobot = 1000 THEN
+				CommData.qxPLCStrobe:=TRUE;
+				ABB:=1000;
+			END_IF
+		END_IF	
+	105:
+		IF  NOT CommData.ixRobotStrobe AND CommData.iwProgressRobot = 0 THEN
+			CommData.qxPLCStrobe:=FALSE;
+			ABB:=201;
+		END_IF
+	
+	200:
+		CommData.mwABBPosXaxis:=CommData.ABBPostions.Home.X;
+		CommData.mwABBPosYaxis:=CommData.ABBPostions.Home.Y;
+		mxExecuting:=TRUE;
+		CommData.mxStartABB:=TRUE;
+		IF CommData.mwXaxis = CommData.ABBPostions.Home.X AND CommData.mwYaxis = CommData.ABBPostions.Home.Y THEN
+			ABB:=201;
+		ELSIF gvl.ixEmergencyStop THEN
+			ABB:=1000;
+		END_IF
+	201:
+		mxExecuting:=FALSE;
+		CommData.mxStartABB:=FALSE;
+		mxDone:=TRUE;
+		IF NOT mxEnable THEN
+			mxDone:=FALSE;
+			ABB:=0;
+		END_IF
+	1000:
+		mxError:=TRUE;
+		mxExecuting:=FALSE;
+		CommData.mxStartABB:=FALSE;
+		IF NOT mxEnable THEN
+			mxError:=FALSE;
+			mxDone:=FALSE;
+			ABB:=0;
+		END_IF
+END_CASE
+
+
+
+IF gvl.ixEmergencyStop THEN
+	ABB:=1000;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="ABBGotoHome">
+      <LineId Id="9" Count="1" />
+      <LineId Id="13" Count="2" />
+      <LineId Id="91" Count="6" />
+      <LineId Id="159" Count="0" />
+      <LineId Id="98" Count="51" />
+      <LineId Id="88" Count="2" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="74" Count="1" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="37" Count="1" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="57" Count="2" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="151" Count="7" />
+      <LineId Id="150" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="28" Count="1" />
+      <LineId Id="160" Count="2" />
+      <LineId Id="21" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="AGVControlSystem" Id="{85ff90c3-9a25-4b65-a177-9c2f095b0cb7}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK AGVControlSystem
+VAR
+	AGV: INT;
+	mxAGVMoveTarget: INT;
+	iwAGVOutofStationPOS: INT;
+	RSpeed:INT:=1;
+END_VAR
+VAR_INPUT
+	iwAGVInStationPOS: INT;
+	mxEnable: BOOL;
+END_VAR
+VAR_OUTPUT
+	qxCurrentAGVPOS: INT := 0;
+	mxAGVAtStation: BOOL;
+	mxAGVoutofStation: BOOL;
+END_VAR
+VAR_INPUT
+	mxAGVReqeust: BOOL;
+	mxPalletPlacedinAGV: BOOL;
+	mxAGVLeave: BOOL;
+	ixAGVOutofStationPOS: INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF mxEnable THEN
+	
+	CASE AGV OF
+		0:
+			IF mxAGVReqeust THEN
+				AGV:=10;
+			END_IF
+		10:
+			mxAGVMoveTarget:= iwAGVInStationPOS;
+			AGV:=20;
+		20:
+			
+			IF mxAGVMoveTarget < qxCurrentAGVPOS THEN
+				qxCurrentAGVPOS:=qxCurrentAGVPOS-RSpeed;
+				AGV:=30;
+			END_IF
+		30:
+			IF mxAGVMoveTarget < qxCurrentAGVPOS THEN
+				AGV:=20;
+			ELSIF  mxAGVMoveTarget >= qxCurrentAGVPOS THEN
+				AGV:=40;
+			END_IF
+		40:
+			mxAGVAtStation:=TRUE;
+			IF mxPalletPlacedinAGV OR mxAGVLeave THEN
+				mxAGVAtStation:=FALSE;
+				AGV:=50;
+			END_IF
+		50:
+			mxAGVMoveTarget:= iwAGVOutofStationPOS;
+			AGV:=60;
+		60:
+			IF mxAGVMoveTarget > qxCurrentAGVPOS THEN
+				qxCurrentAGVPOS:=qxCurrentAGVPOS+RSpeed;
+				AGV:=70;
+			END_IF
+		70:
+			IF mxAGVMoveTarget > qxCurrentAGVPOS THEN
+				AGV:=60;
+			ELSIF  mxAGVMoveTarget <= qxCurrentAGVPOS THEN
+				AGV:=80;
+			END_IF
+		80:
+			mxAGVoutofStation:=TRUE;
+			IF NOT mxAGVReqeust AND NOT mxAGVLeave THEN
+				mxAGVoutofStation:=FALSE;
+				AGV:=0;
+			END_IF
+	END_CASE
+		
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="AGVControlSystem">
+      <LineId Id="296" Count="0" />
+      <LineId Id="298" Count="0" />
+      <LineId Id="215" Count="8" />
+      <LineId Id="227" Count="0" />
+      <LineId Id="280" Count="2" />
+      <LineId Id="279" Count="0" />
+      <LineId Id="228" Count="0" />
+      <LineId Id="287" Count="3" />
+      <LineId Id="286" Count="0" />
+      <LineId Id="234" Count="2" />
+      <LineId Id="295" Count="0" />
+      <LineId Id="237" Count="5" />
+      <LineId Id="283" Count="2" />
+      <LineId Id="246" Count="1" />
+      <LineId Id="291" Count="3" />
+      <LineId Id="252" Count="6" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="301" Count="0" />
+      <LineId Id="300" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

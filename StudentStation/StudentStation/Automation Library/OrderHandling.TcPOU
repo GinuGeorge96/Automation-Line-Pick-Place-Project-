@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.16">
+  <POU Name="OrderHandling" Id="{0055eee3-1759-468e-b376-63e0e9a8e98c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK OrderHandling
+VAR_INPUT
+	mxEnable: BOOL;
+	msOrderfornextAssemblyfromStation: STRING;
+	msProductNames: Array[1..9] OF STRING;
+	mxAGVAtStation: BOOL;
+	mxPalletonAGV: BOOL;
+	mxAGVoutofStation: BOOL;
+END_VAR
+VAR_OUTPUT
+	mxErrorCode: INT;
+	mxAGVLeave: BOOL;
+END_VAR
+VAR
+	order: INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF mxEnable THEN
+	CASE order OF
+		0:
+			IF msOrderfornextAssemblyfromStation <> '0' THEN
+				order:= 10;
+			END_IF
+		10:
+			order:=20;
+		20:
+			IF msOrderfornextAssemblyfromStation = msProductNames[1] THEN
+				order:=30;
+			ELSIF msOrderfornextAssemblyfromStation = msProductNames[2] THEN
+				order:=30;
+			ELSIF msOrderfornextAssemblyfromStation = msProductNames[3] THEN
+				order:=30;
+			ELSIF msOrderfornextAssemblyfromStation = msProductNames[4] THEN
+				order:=30;
+			ELSIF msOrderfornextAssemblyfromStation = msProductNames[5] THEN
+				order:=30;
+			ELSIF msOrderfornextAssemblyfromStation = msProductNames[6] THEN
+				order:=30;
+			ELSIF msOrderfornextAssemblyfromStation = msProductNames[7] THEN
+				order:=30;
+			ELSIF msOrderfornextAssemblyfromStation = msProductNames[8] THEN
+				order:=30;
+			ELSIF msOrderfornextAssemblyfromStation = msProductNames[9] THEN
+				order:=30;
+			ELSIF msOrderfornextAssemblyfromStation = 'AssembledProduct' THEN
+				order:=30;
+			ELSIF msOrderfornextAssemblyfromStation = 'InvalidPart' THEN
+				order:=30;
+			ELSE 
+				order:=22;
+			END_IF 
+		22: // Invalid Product Name
+			mxErrorCode:=22;
+				IF msOrderfornextAssemblyfromStation = '0' THEN
+					mxErrorCode:=0;
+					order:= 0;
+				END_IF
+		30:
+			CommData.mxRequestAGV:=TRUE;
+			IF mxAGVAtStation THEN
+				CommData.mxRequestAGV:=FALSE;
+				order:=40;
+			END_IF
+		40:
+			IF mxPalletonAGV THEN
+				mxAGVLeave:=TRUE;
+				order:=50;
+			END_IF
+		50:
+			IF mxAGVoutofStation THEN
+				mxAGVLeave:=FALSE;
+				order:=60;
+			END_IF
+		60:
+			IF msOrderfornextAssemblyfromStation = '0' THEN
+				order:= 0;
+			END_IF
+	END_CASE
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="OrderHandling">
+      <LineId Id="9" Count="1" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="17" Count="2" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="68" Count="17" />
+      <LineId Id="166" Count="1" />
+      <LineId Id="184" Count="1" />
+      <LineId Id="86" Count="1" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="100" Count="0" />
+      <LineId Id="102" Count="3" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="106" Count="2" />
+      <LineId Id="119" Count="0" />
+      <LineId Id="110" Count="1" />
+      <LineId Id="113" Count="2" />
+      <LineId Id="120" Count="0" />
+      <LineId Id="116" Count="0" />
+      <LineId Id="121" Count="1" />
+      <LineId Id="148" Count="0" />
+      <LineId Id="123" Count="1" />
+      <LineId Id="126" Count="0" />
+      <LineId Id="128" Count="1" />
+      <LineId Id="127" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="11" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

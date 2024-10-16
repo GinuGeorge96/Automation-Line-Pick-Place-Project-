@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <POU Name="BookingSystem" Id="{c179f68b-ad90-4b28-8ed2-dab7bdc95a48}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK BookingSystem
+VAR_INPUT
+	mxEnable: BOOL;
+	mxnewBookingReqeust: BOOL;
+END_VAR
+VAR_OUTPUT
+	mxDone:BOOL;
+	mxError:BOOL;
+END_VAR
+VAR
+	booking: INT;
+END_VAR
+
+VAR_IN_OUT
+	mwStationStatus: INT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF mxEnable THEN
+	CASE booking OF
+		0:
+		 	IF mxnewBookingReqeust THEN
+				booking:=10;
+			END_IF
+		10:
+			IF mwStationStatus =100 THEN
+				booking:=20;
+			ELSE 
+				booking:=1000;
+			END_IF
+		20:
+			mwStationStatus:=200;
+			booking:=30;
+		30:
+			mxDone:=TRUE;
+			IF NOT mxnewBookingReqeust THEN
+				mxDone:=FALSE;
+				booking:=0;
+			END_IF
+		1000:
+			mxError:=TRUE;
+			IF NOT mxnewBookingReqeust THEN
+				mxDone:=FALSE;
+				mxError:=FALSE;
+				booking:=0;
+			END_IF
+	END_CASE
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="BookingSystem">
+      <LineId Id="9" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="18" Count="1" />
+      <LineId Id="22" Count="1" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="29" Count="1" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="31" Count="1" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="39" Count="1" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="45" Count="1" />
+      <LineId Id="48" Count="1" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="14" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

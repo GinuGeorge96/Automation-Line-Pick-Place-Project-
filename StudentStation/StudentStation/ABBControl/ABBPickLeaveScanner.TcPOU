@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <POU Name="ABBPickLeaveScanner" Id="{c6d51bb5-fabd-476d-8f0c-40cd4b6f53eb}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK ABBPickLeaveScanner
+VAR_INPUT
+	mxEnable: BOOL;
+	mxPick: BOOL;
+END_VAR
+VAR_OUTPUT
+	mxDone:BOOL;
+	mxExecuting: BOOL;
+	mxError: BOOL;
+END_VAR
+VAR
+	ABB: INT;
+	mwordernumber: DINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE ABB OF
+	0:
+		IF mxEnable AND NOT CommData.mxABBExecuting THEN
+			ABB:=10;
+		END_IF
+	10:
+		IF CommData.mxRobotOnline THEN
+			ABB:=100;
+			ELSE
+			ABB:=200;
+		END_IF
+	100:
+		IF CommData.msRobotLastPos = 'Scanner' THEN
+			ABB:=101;
+		ELSE
+			ABB:=1000;
+		END_IF
+	101:
+		mxExecuting:=TRUE;
+		CommData.maOrderMaker[1] := 6;
+		CommData.maOrderMaker[3] := 0;
+		CommData.maOrderMaker[4] := 0;
+		CommData.maOrderMaker[5] := 0;
+		CommData.maOrderMaker[6] := 0;
+		ABB:=102;
+	102:
+		IF mxPick THEN
+			CommData.maOrderMaker[2] := 1;
+			ABB:=103;
+		ELSIF NOT mxPick THEN
+			CommData.maOrderMaker[2] := 0;
+			ABB:=103;
+		END_IF
+	103:
+		mwordernumber:=CommData.maOrderMaker[1];
+			mwordernumber:=mwordernumber*10;
+			abb:=1151;
+	1151:
+			mwordernumber:=mwordernumber+CommData.maOrderMaker[2];
+			abb:=1152;
+	1152:
+			mwordernumber:=mwordernumber*10;
+			abb:=1153;
+	1153:
+			mwordernumber:=mwordernumber+CommData.maOrderMaker[3];
+			abb:=1154;
+	1154:
+			mwordernumber:=mwordernumber*10;
+			abb:=1155;
+	1155:
+			mwordernumber:=mwordernumber+CommData.maOrderMaker[4];
+			abb:=1156;
+	1156:
+			mwordernumber:=mwordernumber*10;
+			abb:=1157;
+	1157:
+			mwordernumber:=mwordernumber+CommData.maOrderMaker[5];
+			abb:=1158;
+	1158:
+			mwordernumber:=mwordernumber*10;
+			abb:=1159;
+	1159:
+			mwordernumber:=mwordernumber+CommData.maOrderMaker[6];
+			ABB:=1160;
+	1160:
+		CommData.qwOrderRobot:=mwordernumber;
+		ABB:=104;
+	104:
+		IF CommData.qwOrderRobot > 0 THEN
+			CommData.qxPLCStrobe:=TRUE;
+			ABB:=105;
+		END_IF
+	105:
+		IF CommData.ixRobotStrobe THEN
+			IF CommData.iwReplyRobot = CommData.qwOrderRobot+1 THEN
+				CommData.qwOrderRobot:=0;
+				mwordernumber:=0;
+				CommData.qxPLCStrobe:=FALSE;
+				ABB:=106;
+			ELSE
+				ABB:=1000;
+			END_IF
+		END_IF
+	106:
+		IF NOT CommData.ixRobotStrobe THEN
+			IF CommData.iwReplyRobot = 0 THEN
+				ABB:=107;
+			ELSE
+				ABB:=1000;
+			END_IF
+		END_IF
+	107:
+		IF CommData.ixRobotStrobe THEN
+			IF CommData.iwProgressRobot = 90 THEN
+				CommData.qxPLCStrobe:=TRUE;
+				ABB:=108;
+			END_IF
+			IF CommData.iwProgressRobot = 1000 THEN
+				CommData.qxPLCStrobe:=TRUE;
+				ABB:=1000;
+			END_IF
+		END_IF
+	108:
+		IF  NOT CommData.ixRobotStrobe AND CommData.iwProgressRobot = 0 THEN
+			CommData.qxPLCStrobe:=FALSE;
+			ABB:=202;
+		END_IF
+		
+		
+		
+	200:
+		mxExecuting:=TRUE;
+		IF CommData.mwXaxis = CommData.ABBPostions.Scannerhome.X AND CommData.mwYaxis = CommData.ABBPostions.Scannerhome.Y THEN
+			ABB:=201;
+		ELSE
+			ABB:=1000;
+		END_IF
+	201:
+		IF mxpick THEN
+			IF NOT CommData.mxGripper THEN
+				CommData.mxGripper:=TRUE;
+				ABB:=202;
+			ELSE
+				ABB:=1000;
+			END_IF
+		ELSIF NOT mxPick THEN
+			IF CommData.mxGripper THEN
+				CommData.mxGripper:=FALSE;
+				ABB:=202;
+			ELSE
+				ABB:=1000;
+			END_IF
+		END_IF
+	202:
+		mxExecuting:=FALSE;
+		mxDone:=TRUE;
+		IF NOT mxEnable THEN
+			mxError:=FALSE;
+			mxDone:=FALSE;
+			ABB:=0;
+		END_IF
+	1000:
+		mxError:=TRUE;
+		mxExecuting:=FALSE;
+		IF NOT mxEnable THEN
+			mxError:=FALSE;
+			mxDone:=FALSE;
+			ABB:=0;
+		END_IF
+END_CASE
+
+
+
+IF gvl.ixEmergencyStop THEN
+	ABB:=1000;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="ABBPickLeaveScanner">
+      <LineId Id="73" Count="5" />
+      <LineId Id="139" Count="99" />
+      <LineId Id="136" Count="0" />
+      <LineId Id="240" Count="1" />
+      <LineId Id="243" Count="0" />
+      <LineId Id="137" Count="0" />
+      <LineId Id="79" Count="3" />
+      <LineId Id="84" Count="8" />
+      <LineId Id="94" Count="5" />
+      <LineId Id="101" Count="11" />
+      <LineId Id="135" Count="0" />
+      <LineId Id="113" Count="8" />
+      <LineId Id="244" Count="2" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

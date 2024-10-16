@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <POU Name="Visualaisation_Control" Id="{212f1124-e6e9-482c-9a19-e43dd5520b3d}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM Visualaisation_Control
+VAR
+	mxDebugButton: BOOL;
+	mxDebugMode: BOOL;
+	mxStationStatus: STRING;
+	mxManualMode: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF mxDebugButton THEN
+	mxDebugMode:=TRUE;
+ELSE
+	mxDebugMode:=FALSE;
+END_IF
+
+//100:Ready to Work § 200: Getting Booked § 300: Booked and Busy § 400 : Manual mode  § 500: Pause Mode § 1000 : Emergency Mode 
+IF gvl.mwStationStatus = 100 THEN
+	mxStationStatus:= 'Ready for Order';
+	mxManualMode:=FALSE;
+ELSIF gvl.mwStationStatus = 200 THEN
+	mxStationStatus:= 'Executing booking order from IOStation';
+	mxManualMode:=FALSE;
+ELSIF gvl.mwStationStatus = 300 THEN
+	mxStationStatus:= 'Booked for Order or Busy';
+	mxManualMode:=FALSE;
+ELSIF gvl.mwStationStatus = 400 THEN
+	mxStationStatus:= 'Manual Mode';
+	mxManualMode:=TRUE;
+ELSIF gvl.mwStationStatus = 500 THEN
+	mxStationStatus:= 'Pause Mode';
+ELSIF gvl.mwStationStatus = 1000 OR  gvl.ixEmergencyStop THEN
+	mxStationStatus:= 'Emergency Mode';
+	mxManualMode:=FALSE;
+ELSIF gvl.mwStationStatus = 0 THEN
+	mxStationStatus:= 'Intial Mode';
+	mxManualMode:=FALSE;
+ELSIF  gvl.mwStationStatus = 50 THEN
+	mxStationStatus:= 'Pre-Condition State';
+ELSE
+	mxStationStatus:= 'Status Unknown';
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="Visualaisation_Control">
+      <LineId Id="5" Count="1" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="63" Count="0" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="54" Count="1" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="52" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

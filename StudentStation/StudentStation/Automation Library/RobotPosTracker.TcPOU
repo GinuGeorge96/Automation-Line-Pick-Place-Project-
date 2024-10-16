@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <POU Name="RobotPosTracker" Id="{3652d65f-64b5-4b68-bb8b-0c3490651e91}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM RobotPosTracker
+VAR
+	Robot: INT;
+	maLastOrder:ARRAY[1..6] OF INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE Robot OF
+	0:
+		IF CommData.mxRobotOnline THEN
+			Robot:=10;
+		END_IF
+	10:
+		IF CommData.qxPLCStrobe THEN
+			maLastOrder:=CommData.maOrderMaker;
+			Robot:=20;
+		END_IF
+	20:
+		IF CommData.iwProgressRobot =90 AND CommData.ixRobotStrobe THEN
+			Robot:=30;
+		END_IF
+	30:
+		IF maLastOrder[1] = 1 THEN
+			IF maLastOrder[6] = 0 THEN
+				Robot:=40;
+			ELSIF maLastOrder[6] = 5 THEN
+				Robot:=41;
+			END_IF
+		ELSIF  maLastOrder[1] = 2 THEN
+			IF maLastOrder[6] = 0 THEN
+				Robot:=42;
+			ELSIF maLastOrder[6] = 5 THEN
+				Robot:=43;
+			END_IF
+		ELSIF  maLastOrder[1] = 3 THEN
+			Robot:=44;
+		ELSIF maLastOrder[1] = 4 THEN
+			Robot:=45;
+		ELSIF maLastOrder[1] = 5 THEN
+			Robot:=46;
+		ELSIF maLastOrder[1] = 6 THEN
+			Robot:=47;
+		ELSIF maLastOrder[1] = 7 THEN
+			Robot:=48;
+		ELSIF maLastOrder[1] = 8 THEN
+			Robot:=49;
+		ELSIF maLastOrder[1] = 9 THEN
+			Robot:=50;
+		END_IF 
+	40:
+		CommData.msRobotLastPos:='Home';
+		Robot:=1000;
+	41:
+		CommData.msRobotLastPos:='Buffer';
+		Robot:=1000;
+	42:
+		CommData.msRobotLastPos:='AGV';
+		Robot:=1000;
+	43:
+		CommData.msRobotLastPos:='Scanner';
+		Robot:=1000;
+	44:
+		CommData.msRobotLastPos:='Table';
+		Robot:=1000;
+		
+	45:
+		CommData.msRobotLastPos:='AGV';
+		Robot:=1000;
+	46:
+		CommData.msRobotLastPos:='Table';
+		Robot:=1000;
+	47:
+		CommData.msRobotLastPos:='Scanner';
+		Robot:=1000;
+	48:
+		CommData.msRobotLastPos:='Table';
+		Robot:=1000;
+	49:
+		CommData.msRobotLastPos:='Table';
+		Robot:=1000;
+	50:
+		CommData.msRobotLastPos:='Buffer';
+		Robot:=1000;
+		
+	1000:
+		IF CommData.iwProgressRobot =0 AND NOT CommData.qxPLCStrobe THEN
+			Robot:=0;
+		END_IF
+END_CASE]]></ST>
+    </Implementation>
+    <LineIds Name="RobotPosTracker">
+      <LineId Id="5" Count="1" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="18" Count="1" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="20" Count="3" />
+      <LineId Id="32" Count="1" />
+      <LineId Id="35" Count="1" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="45" Count="4" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="82" Count="1" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="87" Count="10" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="37" Count="5" />
+      <LineId Id="51" Count="2" />
+      <LineId Id="59" Count="1" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="62" Count="1" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="84" Count="0" />
+      <LineId Id="65" Count="1" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="68" Count="1" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="71" Count="1" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="74" Count="1" />
+      <LineId Id="73" Count="0" />
+      <LineId Id="77" Count="1" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="98" Count="4" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="7" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

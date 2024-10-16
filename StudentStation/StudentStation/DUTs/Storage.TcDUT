@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.16">
+  <DUT Name="Storage" Id="{b8019088-7461-4c6d-b793-eaf619a7cf86}">
+    <Declaration><![CDATA[TYPE Storage :
+STRUCT
+	Component: STRING;
+	Quatity: INT;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

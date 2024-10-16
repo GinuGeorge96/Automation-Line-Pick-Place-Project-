@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="ABBScannerStation" Id="{41bb971a-3d77-47a0-9f8d-97aedaa7a92a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK ABBScannerStation
+VAR_INPUT
+	mxEnable: BOOL;
+END_VAR
+VAR_OUTPUT
+	mxDone:BOOL;
+	mxExecuting: BOOL;
+	mxError: BOOL;
+END_VAR
+VAR
+	ABB: INT;
+	mxWaitingforsensorinput: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE ABB OF
+	0:
+		IF mxEnable THEN
+			ABB:=10;
+		END_IF
+	10:
+		IF (CommData.mwXaxis = CommData.ABBPostions.Scannerhome.X AND CommData.mwYaxis = CommData.ABBPostions.Scannerhome.Y) OR CommData.msRobotLastPos = 'Scanner'  THEN
+			ABB:=20;
+		ELSIF CommData.mxRobotOnline THEN
+			ABB:=30;
+		ELSE
+			ABB:=1000;
+		END_IF
+	20:
+		IF CommData.mxRobotOnline THEN
+			ABB:=30;
+		ELSE
+			mxExecuting:=TRUE;
+			commdata.mxWaitingforSensorinput:=TRUE;
+			IF CommData.mxScannernoobject THEN
+				ABB:=30;
+			END_IF
+		END_IF	
+	30:
+		commdata.mxWaitingforSensorinput:=FALSE;
+		mxExecuting:=FALSE;
+		mxDone:=TRUE;
+		IF NOT mxEnable THEN
+			mxDone:=FALSE;
+			ABB:=0;
+		END_IF
+	1000:
+		mxExecuting:=FALSE;
+		mxError:=TRUE;
+		IF NOT mxEnable THEN
+			mxError:=FALSE;
+			mxDone:=FALSE;
+			ABB:=0;
+		END_IF
+		
+END_CASE
+
+
+
+IF gvl.ixEmergencyStop THEN
+	ABB:=1000;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="ABBScannerStation">
+      <LineId Id="14" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="38" Count="1" />
+      <LineId Id="140" Count="1" />
+      <LineId Id="40" Count="1" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="116" Count="1" />
+      <LineId Id="119" Count="0" />
+      <LineId Id="122" Count="3" />
+      <LineId Id="120" Count="0" />
+      <LineId Id="118" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="52" Count="2" />
+      <LineId Id="79" Count="0" />
+      <LineId Id="56" Count="8" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="115" Count="0" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="98" Count="3" />
+      <LineId Id="94" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

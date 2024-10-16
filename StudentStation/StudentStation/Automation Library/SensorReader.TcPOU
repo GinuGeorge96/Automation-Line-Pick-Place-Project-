@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="SensorReader" Id="{aa91b23e-85b8-4465-b57d-fffd9118ff41}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK SensorReader
+VAR_INPUT
+	mxEnable: BOOL;
+END_VAR
+VAR_OUTPUT
+	Product:STRING;
+END_VAR
+VAR
+	SensorReader:BYTE;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF mxEnable THEN
+	SensorReader.1:=gvl.ixInductiveSensor1;
+	SensorReader.2:=gvl.ixInductiveSensor2;
+	SensorReader.3:=gvl.ixInductiveSensor3;
+	SensorReader.4:=gvl.ixInductiveSensor4;
+END_IF
+
+IF SensorReader = 0 OR SensorReader = 4 OR SensorReader = 2 OR SensorReader = 6 THEN
+ 	Product:='InvalidPart';
+END_IF
+
+IF SensorReader=16 THEN
+	Product:='Blue Container';
+END_IF
+
+IF SensorReader=8 THEN
+	Product:='Yellow Container';
+END_IF
+
+IF SensorReader=24 THEN
+	Product:='Red Container';
+END_IF
+
+IF SensorReader=20 THEN
+	Product:='Blue Cylinder';
+END_IF
+
+IF SensorReader=12 THEN
+	Product:='Blue Octagon';
+END_IF
+
+IF SensorReader=28 THEN
+	Product:='Blue Plate';
+END_IF
+
+IF SensorReader=18 THEN
+	Product:='Yellow Cylinder';
+END_IF
+
+IF SensorReader=10 THEN
+	Product:='Yellow Octagon';
+END_IF
+
+IF SensorReader=26 THEN
+	Product:='Yellow Plate';
+END_IF
+
+IF SensorReader=22 THEN
+	Product:='Red Cylinder';
+END_IF
+
+IF SensorReader=14 THEN
+	Product:='Red Octagon';
+END_IF
+
+IF SensorReader=30 THEN
+	Product:='Red Plate';
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="SensorReader">
+      <LineId Id="18" Count="0" />
+      <LineId Id="30" Count="3" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="44" Count="1" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="49" Count="1" />
+      <LineId Id="52" Count="2" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="56" Count="2" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="60" Count="2" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="64" Count="2" />
+      <LineId Id="63" Count="0" />
+      <LineId Id="68" Count="2" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="72" Count="2" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="76" Count="2" />
+      <LineId Id="75" Count="0" />
+      <LineId Id="80" Count="2" />
+      <LineId Id="79" Count="0" />
+      <LineId Id="84" Count="2" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="88" Count="2" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="92" Count="2" />
+      <LineId Id="91" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

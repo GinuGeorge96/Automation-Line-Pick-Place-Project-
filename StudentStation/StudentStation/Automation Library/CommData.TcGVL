@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="CommData" Id="{1b830102-cc50-46d2-927d-3bd7f5364267}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	msProductNames : ARRAY[1..9] OF STRING := ['BLUECYLINDER', 'BLUEOCTAGON', 'BLUEPLATE', 'YELLOWCYLINDER', 'YELLOWOCTAGON', 'YELLOWPLATE', 'REDCYLINDER', 'REDOCTAGON', 'REDPLATE'];
+	mxRequestAGV: BOOL;
+	mxAGVOutsideStation: BOOL;
+	mxAGVLeaveStation: BOOL;
+	mwAGVinStationPOS: INT := -700;
+	mwAGVinOutsidePOS: INT := 0;
+	mwCurrentAGVPOS: INT;
+	ABBPostions: ABBPositions := (Bufferhome := (X := -185, Y := 250), Scannerhome := (X := -185, Y := 180), Tablehome := (X := -185, Y :=350), AGVPOShome := (X := -60, Y := 350), Storage1 := (X := -315, Y := 180), Storage2 := (X := -315, Y := 350), Storage3 := (X := -60, Y := 180));
+	mxOnlineMode: BOOL;
+	mxABBExecuting: BOOL;
+	mwXaxis: INT;
+	mwYaxis: INT;
+	mxGripper: BOOL;
+	mwABBPosXaxis: INT;
+	mwABBPosYaxis: INT;
+	mxStartABB: BOOL;
+	mxScannernoobject:BOOL;
+	mxWaitingforSensorinput:BOOL;
+	mxNewBookingrequest: BOOL;
+	
+	
+	//Robot Control Signals
+	mxRobotOnline AT %I*:BOOL;
+	msRobotLastPos:STRING;
+	qwOrderRobot AT %Q*:DINT;
+	iwReplyRobot AT %I*:DINT;
+	qxPLCStrobe AT %Q*:BOOL;
+	ixRobotStrobe AT %I*:BOOL;
+	iwProgressRobot AT %I*: INT;
+	maOrderMaker: ARRAY[1..6] OF INT;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

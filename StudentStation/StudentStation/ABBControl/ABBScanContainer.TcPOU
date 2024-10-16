@@ -1,0 +1,230 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="ABBScanContainer" Id="{9ddd5ef0-746e-41e4-8c26-d9c8bb44ffd0}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK ABBScanContainer
+VAR_INPUT
+	mxEnable: BOOL;
+	mwPartno: INT;
+END_VAR
+VAR_OUTPUT
+	mxDone: BOOL;
+	mxExecuting: BOOL;
+	mxRobotatScanPos:BOOL;
+	mxError: BOOL;
+END_VAR
+VAR
+	ABB: INT;
+	mxWaitingforsensorinput: BOOL;
+	mwordernumber: DINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE ABB OF
+		0:
+			IF mxEnable AND NOT CommData.mxABBExecuting THEN
+				ABB:=10;
+			END_IF
+		10:
+			IF CommData.mxRobotOnline THEN
+			ABB:=100;
+			ELSE
+			ABB:=200;
+		END_IF
+		100:
+			IF CommData.msRobotLastPos = 'Table' THEN
+				ABB:=101;
+			ELSE
+				ABB:=1000;
+			END_IF
+		101:
+			mxExecuting:=TRUE;
+			CommData.maOrderMaker[1] := 7;
+			CommData.maOrderMaker[2] := 0;
+			CommData.maOrderMaker[3] := 0;
+			CommData.maOrderMaker[4] := 0;
+			CommData.maOrderMaker[6] := 0;
+			ABB:=102;
+		102:
+			IF mwPartno = 1 OR mwPartno = 2 OR mwPartno = 3 THEN
+				CommData.maOrderMaker[5] := mwPartno;
+				ABB:=103;
+			ELSE
+					ABB:=1000;//Error
+			END_IF
+		103:
+			mwordernumber:=CommData.maOrderMaker[1];
+				mwordernumber:=mwordernumber*10;
+				abb:=1151;
+		1151:
+				mwordernumber:=mwordernumber+CommData.maOrderMaker[2];
+				abb:=1152;
+		1152:
+			mwordernumber:=mwordernumber*10;
+				abb:=1153;
+		1153:
+				mwordernumber:=mwordernumber+CommData.maOrderMaker[3];
+				abb:=1154;
+		1154:
+				mwordernumber:=mwordernumber*10;
+				abb:=1155;
+		1155:
+				mwordernumber:=mwordernumber+CommData.maOrderMaker[4];
+				abb:=1156;
+		1156:
+				mwordernumber:=mwordernumber*10;
+				abb:=1157;
+		1157:
+				mwordernumber:=mwordernumber+CommData.maOrderMaker[5];
+				abb:=1158;
+		1158:
+				mwordernumber:=mwordernumber*10;
+				abb:=1159;
+		1159:
+				mwordernumber:=mwordernumber+CommData.maOrderMaker[6];
+				ABB:=1160;
+		1160:
+			CommData.qwOrderRobot:=mwordernumber;
+			ABB:=104;
+		104:
+			IF CommData.qwOrderRobot > 0 THEN
+				CommData.qxPLCStrobe:=TRUE;
+				ABB:=105;
+			END_IF
+		105:
+			IF CommData.ixRobotStrobe THEN
+				IF CommData.iwReplyRobot = CommData.qwOrderRobot+1 THEN
+					CommData.qwOrderRobot:=0;
+					mwordernumber:=0;
+					CommData.qxPLCStrobe:=FALSE;
+					ABB:=106;
+				ELSE
+					ABB:=1000;
+				END_IF
+			END_IF
+		106:
+			IF NOT CommData.ixRobotStrobe THEN
+				IF CommData.iwReplyRobot = 0 THEN
+					ABB:=1061;
+				ELSE
+					ABB:=1000;
+				END_IF
+			END_IF
+		1061:
+			IF CommData.iwProgressRobot = 50 THEN
+				mxRobotatScanPos:=TRUE;
+				ABB:=107;
+			END_IF
+		107:
+			IF CommData.ixRobotStrobe THEN
+				mxRobotatScanPos:=FALSE;
+				IF CommData.iwProgressRobot = 90 THEN
+					CommData.qxPLCStrobe:=TRUE;
+					ABB:=108;
+				END_IF
+				IF CommData.iwProgressRobot = 1000 THEN
+					CommData.qxPLCStrobe:=TRUE;
+					ABB:=1000;
+				END_IF
+			END_IF
+		108:
+			IF  NOT CommData.ixRobotStrobe AND CommData.iwProgressRobot = 0 THEN
+				CommData.qxPLCStrobe:=FALSE;
+				ABB:=203;
+			END_IF
+		
+		
+		
+		
+		
+		200:
+			IF mwPartno = 1 OR mwPartno = 2 OR mwPartno = 3 THEN
+				ABB:=201;
+			ELSE
+				ABB:=1000;//Error
+			END_IF
+		201:
+			IF CommData.mwXaxis = CommData.ABBPostions.Tablehome.X AND CommData.mwYaxis = CommData.ABBPostions.Tablehome.Y THEN
+				ABB:=202;
+			ELSE
+				ABB:=1000;
+			END_IF
+		202:
+			mxExecuting:=TRUE;
+			mxRobotatScanPos:=TRUE;
+			commdata.mxWaitingforSensorinput:=TRUE;
+			IF GVL.ixInductiveSensorinTool OR CommData.mxScannernoobject THEN
+				ABB:=203;
+			END_IF
+		203:
+			commdata.mxWaitingforSensorinput:=FALSE;
+			mxRobotatScanPos:=FALSE;
+			mxExecuting:=FALSE;
+			mxDone:=TRUE;
+			IF NOT mxEnable THEN
+				mxDone:=FALSE;
+				ABB:=0;
+			END_IF
+		1000:
+			mxExecuting:=FALSE;
+			mxError:=TRUE;
+			IF NOT mxEnable THEN
+				mxError:=FALSE;
+				mxDone:=FALSE;
+				ABB:=0;
+			END_IF
+END_CASE
+
+
+
+IF gvl.ixEmergencyStop THEN
+	ABB:=1000;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="ABBScanContainer">
+      <LineId Id="173" Count="1" />
+      <LineId Id="214" Count="3" />
+      <LineId Id="239" Count="9" />
+      <LineId Id="236" Count="0" />
+      <LineId Id="249" Count="6" />
+      <LineId Id="237" Count="0" />
+      <LineId Id="256" Count="1" />
+      <LineId Id="238" Count="0" />
+      <LineId Id="269" Count="0" />
+      <LineId Id="261" Count="1" />
+      <LineId Id="259" Count="0" />
+      <LineId Id="344" Count="57" />
+      <LineId Id="437" Count="2" />
+      <LineId Id="460" Count="0" />
+      <LineId Id="440" Count="0" />
+      <LineId Id="402" Count="1" />
+      <LineId Id="443" Count="0" />
+      <LineId Id="404" Count="12" />
+      <LineId Id="263" Count="5" />
+      <LineId Id="234" Count="0" />
+      <LineId Id="175" Count="1" />
+      <LineId Id="181" Count="1" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="183" Count="0" />
+      <LineId Id="187" Count="3" />
+      <LineId Id="186" Count="0" />
+      <LineId Id="191" Count="1" />
+      <LineId Id="462" Count="0" />
+      <LineId Id="196" Count="0" />
+      <LineId Id="193" Count="2" />
+      <LineId Id="198" Count="1" />
+      <LineId Id="463" Count="0" />
+      <LineId Id="200" Count="0" />
+      <LineId Id="202" Count="1" />
+      <LineId Id="206" Count="0" />
+      <LineId Id="204" Count="1" />
+      <LineId Id="201" Count="0" />
+      <LineId Id="208" Count="0" />
+      <LineId Id="213" Count="0" />
+      <LineId Id="209" Count="3" />
+      <LineId Id="207" Count="0" />
+      <LineId Id="184" Count="0" />
+      <LineId Id="417" Count="4" />
+      <LineId Id="185" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

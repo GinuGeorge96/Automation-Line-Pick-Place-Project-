@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="GVL" Id="{e8e7ca99-872a-4382-9673-b82942111ce7}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	// Order for the next assembly part. The part name should be sent as per the part list and case sensitive. 
+	{attribute 'OPC.UA.DA' := '1'}
+	qsOrderFornextAssembly AT %Q*: STRING := '0';
+	// Parts in your Station buffer. Each buffer have 3 storage locations. The part name and quantity should be mentioned.
+	{attribute 'OPC.UA.DA' := '1'}
+	BufferProducts AT %Q*: Station;
+	// Signal to AGV, a pallet is placed from Station to the AGV. 
+	{attribute 'OPC.UA.DA' := '1'}
+	qxPalletPlacedinAGV AT %Q*: BOOL;
+	// Signal From AGV, that it have docked in your station
+	{attribute 'OPC.UA.DA' := '1'}
+	ixAGVatStation AT %I*: BOOL;
+	// Signal Denoting An AGV have arrived in the Station
+	{attribute 'OPC.UA.DA' := '1'}	
+	qxPickedfromAGV AT %Q*:BOOL; //Part is picked up from the AGV
+	{attribute 'OPC.UA.DA' := '1'}
+	mwStationStatus AT %Q*: INT; //Pre-Conditioning Mode //100:Ready to Work § 200: Getting Booked § 300: Booked and Busy § 400 : Manual mode  § 500: Pause Mode § 1000 : Emergency Mode 
+	{attribute 'OPC.UA.DA' := '1'}	
+	// Emergency Stop is active
+	ixEmergencyStop AT %Q*:BOOL;
+	
+	// Inductive sensor reading. from scaning station
+	ixInductiveSensor1 AT %I*:BOOL;
+	// Inductive sensor reading. from scaning station
+	ixInductiveSensor2 AT %I*:BOOL;
+	// Inductive sensor reading. from scaning station
+	ixInductiveSensor3 AT %I*:BOOL;
+	// Inductive sensor reading. from scaning station
+	ixInductiveSensor4 AT %I*:BOOL;
+	// Inductive sensor reading. from the sensor in robot Tool
+	ixInductiveSensorinTool AT %I*:BOOL;
+	// Station ID of the station you are working with.
+	{attribute 'OPC.UA.DA' := '1'}
+	mwStationID AT %Q*: INT;
+	
+	sABBFunction : ARRAY [1..12] OF STRING := ['ABBAssemble','ABBGotoAGVPos','ABBGotoBuffer','ABBGotoHome','ABBGotoScanner','ABBGotoTable','ABBPickLeaveBuffer','ABBPickLeaveContainerAGV','ABBPickLeaveContainerOnTable','ABBPickLeaveScanner','ABBScanContainer', 'ABBScannerStation'];
+	sBufferIDlist : ARRAY [1..3] OF STRING := ['Storage Position 1','Storage Position 2','Storage Position 3'];
+	sPart : ARRAY [1..3] OF STRING := ['Plate','Cylinder','Octagon'];
+	sPickOrLeave : ARRAY [1..2] OF STRING := ['Pick','Leave'];
+	sABBFunctionList : ARRAY [1..12] OF STRING := ['ABBAssemble','ABBGotoAGVPos','ABBGotoBuffer','ABBGotoHome','ABBGotoScanner','ABBGotoTable','ABBPickLeaveBuffer','ABBPickLeaveContainerAGV','ABBPickLeaveContainerOnTable','ABBPickLeaveScanner','ABBScanContainer', 'ABBScannerStation'];
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

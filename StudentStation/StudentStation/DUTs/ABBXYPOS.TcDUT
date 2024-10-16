@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.16">
+  <DUT Name="ABBXYPOS" Id="{fe5a3c95-fc3b-4a95-ba4f-4ca4a86f7b3c}">
+    <Declaration><![CDATA[TYPE ABBXYPOS :
+STRUCT
+	X:	INT;
+	Y:	INT;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

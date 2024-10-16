@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.16">
+  <DUT Name="ABBPositions" Id="{26d83832-f8b5-4006-84c0-ed4c4c83c383}">
+    <Declaration><![CDATA[TYPE ABBPositions :
+STRUCT
+	Home: ABBXYPOS;
+	Bufferhome: ABBXYPOS;
+	Scannerhome: ABBXYPOS;
+	Tablehome: ABBXYPOS;
+	AGVPOShome: ABBXYPOS;
+	Storage1: ABBXYPOS;
+	Storage2: ABBXYPOS;
+	Storage3: ABBXYPOS;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

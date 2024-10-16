@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <POU Name="PhysicalSystemTest" Id="{18e66b61-bfa1-469f-ba97-fead9c46c956}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM PhysicalSystemTest
+VAR
+	ABB: INT;
+	TwoSecTimer: TON;
+	mxTimerStart:BOOL;
+	mxTimerDone:BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE ABB OF
+	0:
+		IF CommData.qxPLCStrobe THEN
+			ABB:=10;
+		END_IF
+	10:
+		IF CommData.qwOrderRobot > 0 THEN
+			CommData.iwReplyRobot:=CommData.qwOrderRobot+1;
+			mxTimerStart:=TRUE;
+			ABB:=20;
+		END_IF
+	20:
+		IF mxTimerDone THEN
+			CommData.ixRobotStrobe :=TRUE;
+			mxTimerStart:=FALSE;
+			ABB:=30;
+		END_IF
+	30:
+		IF NOT CommData.qxPLCStrobe THEN
+			mxTimerStart:=TRUE;
+			ABB:=40;
+		END_IF
+	40:
+		IF mxTimerDone THEN
+			CommData.iwReplyRobot:=0;
+			CommData.ixRobotStrobe :=FALSE;
+			mxTimerStart:=FALSE;
+			ABB:=50;
+		END_IF
+	50:
+		mxTimerStart:=TRUE;
+		IF mxTimerDone THEN
+			mxTimerStart:=FALSE;
+			CommData.iwProgressRobot:=90;
+			ABB:=60;
+		END_IF
+	60:
+		CommData.ixRobotStrobe :=TRUE;
+		mxTimerStart:=TRUE;
+		ABB:=70;
+	70:
+		IF mxTimerDone AND CommData.qxPLCStrobe THEN
+			mxTimerStart:=FALSE;
+			CommData.iwProgressRobot:=0;
+			ABB:=80;
+		END_IF
+	80:
+		mxTimerStart:=TRUE;
+		IF mxTimerDone THEN
+			mxTimerStart:=FALSE;
+			CommData.ixRobotStrobe :=FALSE;
+			ABB:=90;
+		END_IF
+	90:
+		IF NOT CommData.qxPLCStrobe THEN
+			ABB:=0;
+		END_IF
+END_CASE
+
+
+
+TwoSecTimer(IN:= mxTimerStart, PT:= T#2S, Q=> mxTimerDone, ET=> );]]></ST>
+    </Implementation>
+    <LineIds Name="PhysicalSystemTest">
+      <LineId Id="5" Count="1" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="13" Count="2" />
+      <LineId Id="22" Count="1" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="24" Count="2" />
+      <LineId Id="28" Count="1" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="30" Count="2" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="38" Count="2" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="42" Count="2" />
+      <LineId Id="47" Count="1" />
+      <LineId Id="45" Count="1" />
+      <LineId Id="49" Count="6" />
+      <LineId Id="57" Count="1" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="59" Count="1" />
+      <LineId Id="62" Count="1" />
+      <LineId Id="65" Count="1" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="67" Count="2" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="70" Count="1" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="17" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
